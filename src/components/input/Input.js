@@ -1,6 +1,6 @@
 import React from "react";
-import { useController } from "react-hook-form";
 import styled from "styled-components";
+import { useController } from "react-hook-form";
 
 const InputStyles = styled.div`
   position: relative;
@@ -32,7 +32,6 @@ const InputStyles = styled.div`
     cursor: pointer;
   }
 `;
-
 const Input = ({ name = "", type = "text", children, control, ...props }) => {
   const { field } = useController({
     control,
@@ -42,7 +41,7 @@ const Input = ({ name = "", type = "text", children, control, ...props }) => {
   return (
     <InputStyles hasIcon={children ? true : false}>
       <input id={name} type={type} {...field} {...props} />
-      {children ? <div>{children}</div> : null}
+      {children ? <div className="input-icon">{children}</div> : null}
     </InputStyles>
   );
 };

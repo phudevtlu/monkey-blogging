@@ -1,12 +1,12 @@
+import { Button } from "components/button";
+import { Field } from "components/field";
+import { Input } from "components/input";
+import { Label } from "components/label";
 import { useAuth } from "contexts/auth-context";
 import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import AuthenticationPage from "./AuthenticationPage";
-import { Field } from "components/field";
-import { Label } from "components/label";
-import { Input } from "components/input";
 import { useForm } from "react-hook-form";
-import { Button } from "components/button";
+import { Navigate, NavLink, useNavigate } from "react-router-dom";
+import AuthenticationPage from "./AuthenticationPage";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
@@ -21,49 +21,50 @@ const schema = yup.object({
     .required("Please enter your email address"),
   password: yup
     .string()
-    .min(8, "Password is too short - should be 8 chars minimum")
+    .min(8, "Your password must be at least 8 characters or greater")
     .required("Please enter your password"),
 });
-
 const SignInPage = () => {
-  const navigate = useNavigate();
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, errors },
+    formState: { isValid, isSubmitting, errors },
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(schema),
   });
+  useEffect(() => {
+    const arrErroes = Object.values(errors);
+    if (arrErroes.length > 0) {
+      toast.error(arrErroes[0]?.message, {
+        pauseOnHover: false,
+        delay: 0,
+      });
+    }
+  }, [errors]);
+  const { userInfo } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    document.title = "Login Page";
+    if (userInfo?.email) navigate("/");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo]);
   const handleSignIn = async (values) => {
     if (!isValid) return;
     await signInWithEmailAndPassword(auth, values.email, values.password);
     navigate("/");
   };
-
   const [togglePassword, setTogglePassword] = useState(false);
-  useEffect(() => {
-    const arrErrors = Object.values(errors);
-    if (arrErrors.length > 0) {
-      toast.error(arrErrors[0]?.message, {
-        pauseOnHover: false,
-        autoClose: 2000,
-      });
-    }
-  }, [errors]);
 
-  const { userInfo } = useAuth();
-
-  useEffect(() => {
-    document.title = "Login Page";
-    if (userInfo?.email) navigate("/");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   return (
     <AuthenticationPage>
-      <form className="form" onSubmit={handleSubmit(handleSignIn)}>
+      <form
+        className="form"
+        onSubmit={handleSubmit(handleSignIn)}
+        autoComplete="off"
+      >
         <Field>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Email address</Label>
           <Input
             type="email"
             name="email"
@@ -74,34 +75,28 @@ const SignInPage = () => {
         <Field>
           <Label htmlFor="password">Password</Label>
           <Input
-            type="password"
+            type={togglePassword ? "text" : "password"}
             name="password"
             placeholder="Enter your password"
             control={control}
           >
-            {togglePassword ? (
-              <IconEyeOpen
-                className="input-icon"
-                onClick={() => {
-                  setTogglePassword(!togglePassword);
-                }}
-              ></IconEyeOpen>
-            ) : (
+            {!togglePassword ? (
               <IconEyeClose
-                className="input-icon"
-                onClick={() => {
-                  setTogglePassword(!togglePassword);
-                }}
+                onClick={() => setTogglePassword(true)}
               ></IconEyeClose>
+            ) : (
+              <IconEyeOpen
+                onClick={() => setTogglePassword(false)}
+              ></IconEyeOpen>
             )}
           </Input>
         </Field>
-        <div className="check-account">
-          You not have an accout ? <NavLink to={"/sign-up"}>Register</NavLink>
+        <div className="have-account">
+          You have not had an account?{" "}
+          <NavLink to={"/sign-up"}>Register an account</NavLink>{" "}
         </div>
         <Button
           type="submit"
-          kind="primary"
           style={{
             width: "100%",
             maxWidth: 300,

@@ -7,7 +7,7 @@ import { GlobalStyles } from "./styles/GlobalStyles";
 import { theme } from "./utils/constants";
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const container = document.getElementById("root");
@@ -19,7 +19,7 @@ root.render(
       <GlobalStyles></GlobalStyles>
       <BrowserRouter>
         <App />
-        <ToastContainer />
+        <ToastContainer></ToastContainer>
       </BrowserRouter>
     </ThemeProvider>
   </React.StrictMode>

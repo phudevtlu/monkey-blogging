@@ -11,7 +11,7 @@ const AuthenticationPageStyles = styled.div`
   .heading {
     text-align: center;
     color: ${(props) => props.theme.primary};
-    font-weight: 600;
+    font-weight: bold;
     font-size: 40px;
     margin-bottom: 60px;
   }
@@ -19,7 +19,7 @@ const AuthenticationPageStyles = styled.div`
     max-width: 600px;
     margin: 0 auto;
   }
-  .check-account {
+  .have-account {
     margin-bottom: 20px;
     a {
       display: inline-block;

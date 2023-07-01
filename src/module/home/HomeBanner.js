@@ -10,22 +10,23 @@ const HomeBannerStyles = styled.div`
     ${(props) => props.theme.primary},
     ${(props) => props.theme.secondary}
   );
+  margin-bottom: 60px;
   .banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  .banner-content {
-    max-width: 600px;
-    color: white;
-  }
-  .banner-heading {
-    font-size: 36px;
-    margin-bottom: 20px;
-  }
-  .banner-desc {
-    line-height: 1.75;
-    margin-bottom: 40px;
+    &-content {
+      max-width: 600px;
+      color: white;
+    }
+    &-heading {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    &-desc {
+      line-height: 1.75;
+      margin-bottom: 40px;
+    }
   }
 `;
 
@@ -37,10 +38,10 @@ const HomeBanner = () => {
           <div className="banner-content">
             <h1 className="banner-heading">Monkey Blogging</h1>
             <p className="banner-desc">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Numquam
-              tempora impedit atque maiores alias, eius harum at. Numquam quo
-              impedit, fugiat soluta obcaecati alias accusantium, rerum fuga
-              assumenda in quasi.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Laudantium magnam similique accusantium natus esse facilis!
+              Quaerat voluptates possimus dolorem officiis pariatur, repellat,
+              cupiditate porro, quidem molestiae impedit laudantium neque quo!
             </p>
             <Button to="/sign-up" kind="secondary">
               Get started
