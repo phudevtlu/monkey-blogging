@@ -1,65 +1,53 @@
 import React from "react";
+import slugify from "slugify";
 import styled from "styled-components";
 import PostCategory from "./PostCategory";
+import PostImage from "./PostImage";
+import PostMeta from "./PostMeta";
+import PostTitle from "./PostTitle";
 const PostNewestLargeStyles = styled.div`
   .post {
     &-image {
       display: block;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       height: 433px;
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 16px;
-      }
+      border-radius: 16px;
     }
     &-category {
       margin-bottom: 10px;
     }
-    &-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-left: auto;
-    }
-    &-dot {
-      display: inline-block;
-      width: 4px;
-      height: 4px;
-      background-color: currentColor;
-      border-radius: 100rem;
-    }
     &-title {
-      font-weight: bold;
-      line-height: 1.5;
-      display: block;
-      font-size: 22px;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
+    }
+    @media screen and (max-width: 1023.98px) {
+      &-image {
+        height: 250px;
+      }
     }
   }
 `;
 
-const PostNewestLarge = () => {
+const PostNewestLarge = ({ data }) => {
+  if (!data.id) return null;
+  const date = data?.createdAt?.seconds
+    ? new Date(data?.createdAt?.seconds * 1000)
+    : new Date();
+  const formatDate = new Date(date).toLocaleDateString("vi-VI");
   return (
     <PostNewestLargeStyles>
-      <div className="post-image">
-        <img
-          src="https://images.unsplash.com/photo-1510519138101-570d1dca3d66?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2294&q=80"
-          alt=""
-        />
-      </div>
-      <PostCategory>Kiến thức</PostCategory>
-      <h3 className="post-title">
-        Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
-      </h3>
-      <div className="post-info">
-        <span className="post-time">Mar 23</span>
-        <span className="post-dot"></span>
-        <span className="post-author">Andiez Le</span>
-      </div>
+      <PostImage url={data?.image} alt="" to={data?.slug}></PostImage>
+
+      <PostCategory to={data?.category?.slug}>
+        {data?.category?.name}
+      </PostCategory>
+      <PostTitle to={data?.slug} size="big">
+        {data?.title}
+      </PostTitle>
+      <PostMeta
+        to={slugify(data?.user?.username || "", { lower: true })}
+        authorName={data?.user?.fullname}
+        date={formatDate}
+      ></PostMeta>
     </PostNewestLargeStyles>
   );
 };

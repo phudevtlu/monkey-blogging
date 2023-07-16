@@ -1,9 +1,7 @@
 import { Input } from "components/input";
 import { Label } from "components/label";
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { IconEyeClose, IconEyeOpen } from "components/icon";
 import { Field } from "components/field";
 import { Button } from "components/button";
 import * as yup from "yup";
@@ -12,8 +10,11 @@ import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "firebase-app/firebase-config";
 import { NavLink, useNavigate } from "react-router-dom";
-import { addDoc, collection } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
+import InputPasswordToggle from "components/input/InputPasswordToggle";
+import slugify from "slugify";
+import { userRole, userStatus } from "utils/constants";
 
 const schema = yup.object({
   fullname: yup.string().required("Please enter your fullname"),
@@ -42,17 +43,23 @@ const SignUpPage = () => {
     await createUserWithEmailAndPassword(auth, values.email, values.password);
     await updateProfile(auth.currentUser, {
       displayName: values.fullname,
+      photoURL: "",
     });
-    const colRef = collection(db, "users");
-    await addDoc(colRef, {
+
+    await setDoc(doc(db, "users", auth.currentUser.uid), {
       fullname: values.fullname,
       email: values.email,
       password: values.password,
+      username: slugify(values.fullname, { lower: true }),
+      avatar: "",
+      status: userStatus.ACTIVE,
+      role: userRole.USER,
+      createdAt: serverTimestamp(),
     });
+
     toast.success("Register successfully!!!");
     navigate("/");
   };
-  const [togglePassword, setTogglePassword] = useState(false);
   useEffect(() => {
     const arrErroes = Object.values(errors);
     if (arrErroes.length > 0) {
@@ -92,22 +99,7 @@ const SignUpPage = () => {
         </Field>
         <Field>
           <Label htmlFor="password">Password</Label>
-          <Input
-            type={togglePassword ? "text" : "password"}
-            name="password"
-            placeholder="Enter your password"
-            control={control}
-          >
-            {!togglePassword ? (
-              <IconEyeClose
-                onClick={() => setTogglePassword(true)}
-              ></IconEyeClose>
-            ) : (
-              <IconEyeOpen
-                onClick={() => setTogglePassword(false)}
-              ></IconEyeOpen>
-            )}
-          </Input>
+          <InputPasswordToggle control={control}></InputPasswordToggle>
         </Field>
         <div className="have-account">
           You already have an account? <NavLink to={"/sign-in"}>Login</NavLink>{" "}

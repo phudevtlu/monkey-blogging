@@ -1,6 +1,12 @@
-import React from "react";
 import styled from "styled-components";
+import slugify from "slugify";
+import React from "react";
+import PostTitle from "./PostTitle";
+import PostMeta from "./PostMeta";
+import PostImage from "./PostImage";
 import PostCategory from "./PostCategory";
+import { withErrorBoundary } from "react-error-boundary";
+
 const PostFeatureItemStyles = styled.div`
   width: 100%;
   border-radius: 16px;
@@ -10,19 +16,13 @@ const PostFeatureItemStyles = styled.div`
     &-image {
       width: 100%;
       height: 100%;
-      object-fit: cover;
       border-radius: 16px;
     }
     &-overlay {
       position: absolute;
       inset: 0;
       border-radius: 16px;
-      background: linear-gradient(
-        179.77deg,
-        #6b6b6b 36.45%,
-        rgba(163, 163, 163, 0.622265) 63.98%,
-        rgba(255, 255, 255, 0) 99.8%
-      );
+      background-color: rgba(0, 0, 0, 0.75);
       mix-blend-mode: multiply;
       opacity: 0.6;
     }
@@ -39,60 +39,53 @@ const PostFeatureItemStyles = styled.div`
       align-items: center;
       margin-bottom: 16px;
     }
-
-    &-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      color: white;
-      margin-left: auto;
-    }
-    &-dot {
-      display: inline-block;
-      width: 4px;
-      height: 4px;
-      background-color: currentColor;
-      border-radius: 100rem;
-    }
-    &-title {
-      font-weight: bold;
-      line-height: 1.5;
-      display: block;
-      font-size: 22px;
-      color: white;
-    }
   }
 
   @media screen and (min-width: 1024px) {
     height: 272px;
   }
+  @media screen and (max-width: 1023.98px) {
+    .post {
+      &-content {
+        padding: 15px;
+      }
+    }
+  }
 `;
-const PostFeatureItem = () => {
+const PostFeatureItem = ({ data }) => {
+  if (!data || !data.id) return null;
+  const date = data?.createdAt?.seconds
+    ? new Date(data?.createdAt?.seconds * 1000)
+    : new Date();
+  const formatDate = new Date(date).toLocaleDateString("vi-VI");
+  const { category, user } = data;
   return (
     <PostFeatureItemStyles>
-      <img
-        src="https://images.unsplash.com/photo-1614624532983-4ce03382d63d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2662&q=80"
-        alt="unsplash"
-        className="post-image"
-      />
+      <PostImage url={data.image} alt="unsplash"></PostImage>
       <div className="post-overlay"></div>
       <div className="post-content">
         <div className="post-top">
-          <PostCategory>Kiến thức</PostCategory>
-          <div className="post-info">
-            <span className="post-time">Mar 23</span>
-            <span className="post-dot"></span>
-            <span className="post-author">Andiez Le</span>
-          </div>
+          {category?.name && (
+            <PostCategory to={category.slug}>{category.name}</PostCategory>
+          )}
+          <PostMeta
+            to={slugify(user?.username || "", { lower: true })}
+            authorName={user?.fullname}
+            date={formatDate}
+          ></PostMeta>
         </div>
-        <h3 className="post-title">
-          Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
-        </h3>
+        <PostTitle to={data.slug} size="big">
+          {data.title}
+        </PostTitle>
       </div>
     </PostFeatureItemStyles>
   );
 };
-
-export default PostFeatureItem;
+// Example of error boundary
+export default withErrorBoundary(PostFeatureItem, {
+  FallbackComponent: (
+    <p className="p-3 text-red-500 bg-red-100">
+      Look like this component error
+    </p>
+  ),
+});
